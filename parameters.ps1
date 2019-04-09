@@ -1,16 +1,5 @@
-#define parameters
-$prefix = "sc901"
-$XConnectCollectionService = "$prefix.xconnect"
-$sitecoreSiteName = "$prefix.sc"
-$SolrUrl = "https://localhost:8983/solr"
-$SolrRoot = "C:\Solr\6.6.2"
-$SolrService = "Solr-6.6.2"
-$SqlServer = "CHL117109"
-$SqlAdminUser = "sa"
-$SqlAdminPassword = "Password"
-$configsRoot = Join-Path $PSScriptRoot Configs
-$packagesRoot = Join-Path $PSScriptRoot Packages
-$licenseFilePath = Join-Path $PSScriptRoot license.xml
+# Bring parameters into scope
+. $PSScriptRoot\..\globalparameters.ps1
 
 #install client certificate for xconnect
 $certParams = @{
