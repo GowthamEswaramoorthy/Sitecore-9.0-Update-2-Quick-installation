@@ -9,7 +9,7 @@ param(
     [string]$Version        = '6.6.2',
     [string]$NssmVersion    = '2.24',
     [string]$Jre            ='jre1.8.0_172',
-    [int]$Port              = 8984,
+    [int]$Port              = 8983,
     [string]$HostName       = 'localhost',
     [ValidateScript({ Test-Path $_ -Type Container})]
     [string]$DownloadPath   = (Resolve-Path ~/Downloads),
