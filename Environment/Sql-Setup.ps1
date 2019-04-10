@@ -7,11 +7,8 @@
     You may receive errors when changing the contained mode.
     You may need to remove existing/databases users first.
 #>
-param(
-    [string]$ServerName = ($env:COMPUTERNAME),
-    [string]$UserName   = 'sa',
-    [string]$Password   = 'Password'
-)
+# Bring parameters into scope
+. $PSScriptRoot\..\parameters.ps1
 
 $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).Groups -match "S-1-5-32-544")
 if($isAdmin -eq $false) {
@@ -30,4 +27,4 @@ GO
 RECONFIGURE ;
 GO
 "@
-Invoke-SqlCmd -Query $containdQuery -ServerInstance $ServerName -Username $UserName -Password $Password
+Invoke-SqlCmd -Query $containdQuery -ServerInstance $SqlServer -Username $SqlAdminUser -Password $SqlAdminPassword

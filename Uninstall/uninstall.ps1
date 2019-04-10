@@ -4,8 +4,8 @@
 $uninstallArgs = @{
     Path = "$PSScriptRoot\uninstall.json"
     Prefix = $prefix
-    SolrRoot = $sitecoreSolr.SolrRoot
-    SolrService = $sitecoreSolr.SolrService
+    SolrRoot = $SolrRoot
+    SolrService = $SolrService
     SqlServer = $sqlServer
 }
 

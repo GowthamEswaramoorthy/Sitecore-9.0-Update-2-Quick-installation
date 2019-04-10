@@ -7,10 +7,8 @@
 
 #Requires -RunAsAdministrator
 
-param(
-    [ValidateScript({Test-Path $_ })]
-    [string]$Downloads = (Resolve-Path ~/Downloads)
-)
+# Bring parameters into scope
+. $PSScriptRoot\..\parameters.ps1
 
 # Check for PowerShell 5.1
 $psversion = $PSVersionTable.PSVersion
@@ -36,7 +34,7 @@ Function ExecAndWait ($Path, $ExecArgs) {
 }
 
 Function InstallPackage ($Source, $FileName, $InstallArgs = '/passive /norestart') {
-    $destination = Join-Path $Downloads $FileName
+    $destination = Join-Path $DownloadPath $FileName
     Invoke-WebRequest -Uri $Source -OutFile $destination
     ExecAndWait -Path $destination -ExecArgs $InstallArgs
 }
