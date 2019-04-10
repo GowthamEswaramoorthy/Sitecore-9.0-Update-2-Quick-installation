@@ -5,7 +5,7 @@
     NOTE: This should be ran on the machine where Solr will be hosted.
 #>
 # Bring parameters into scope
-. $PSScriptRoot\..\globalparameters.ps1
+. $PSScriptRoot\..\parameters.ps1
 
 # Check we have java available
 if($null -eq (Get-Command java -ErrorAction SilentlyContinue)) {

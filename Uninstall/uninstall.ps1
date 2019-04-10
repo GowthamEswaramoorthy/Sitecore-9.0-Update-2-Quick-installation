@@ -1,5 +1,5 @@
 # Bring parameters into scope
-. $PSScriptRoot\..\globalparameters.ps1
+. $PSScriptRoot\..\parameters.ps1
 
 $uninstallArgs = @{
     Path = "$PSScriptRoot\uninstall.json"

@@ -8,7 +8,7 @@
 #Requires -RunAsAdministrator
 
 # Bring parameters into scope
-. $PSScriptRoot\..\globalparameters.ps1
+. $PSScriptRoot\..\parameters.ps1
 
 # Check for PowerShell 5.1
 $psversion = $PSVersionTable.PSVersion

@@ -2,13 +2,16 @@
     Install script for a Sitecore 9.0 Single instance
 #>
 
+# Installation Server setup and Prerequistes
+. $PSScriptRoot\Environment\Server-Setup.ps1
+
 # Installation for Prerequistes
-#. $PSScriptRoot\Uninstall\Prerequisites.ps1
+. $PSScriptRoot\Uninstall\Prerequisites.ps1
 
 # Solr Setup
 . $PSScriptRoot\Environment\Solr-Setup.ps1
 
-# DB Setup
+# # DB Setup
 . $PSScriptRoot\Environment\Sql-Setup.ps1
 
 # Bring parameters into scope

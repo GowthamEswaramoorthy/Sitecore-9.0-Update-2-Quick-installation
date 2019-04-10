@@ -1,5 +1,28 @@
-# Bring parameters into scope
-. $PSScriptRoot\..\globalparameters.ps1
+<#
+    Define the parameters going to used in the project here.
+    All the parameters in the Project must be refered from here.
+#>
+[string]$Version = '6.6.2'
+[string]$NssmVersion = '2.24'
+[string]$Jre = 'jre1.8.0_172'
+[int]$Port = 8983
+[string]$HostName = 'localhost'
+[ValidateScript( { Test-Path $_ -Type Container })]
+[string]$DownloadPath = (Resolve-Path ~/Downloads)
+[ValidateScript( { Test-Path $_ -Type Container })]
+[string]$InstallPath = (Join-Path $env:SystemDrive '\')
+$prefix = "sc901"
+$XConnectCollectionService = "$prefix.xconnect"
+$sitecoreSiteName = "$prefix.sc"
+$SolrUrl = "https://$($HostName):$Port/solr"
+$SolrRoot = "C:\Solr\$Version"
+$SolrService = "Solr-$Version"
+$SqlServer = "localhost"
+$SqlAdminUser = "sa"
+$SqlAdminPassword = "Password"
+$configsRoot = Join-Path $PSScriptRoot Configs
+$packagesRoot = Join-Path $PSScriptRoot Packages
+$licenseFilePath = Join-Path $PSScriptRoot license.xml
 
 #install client certificate for xconnect
 $certParams = @{
