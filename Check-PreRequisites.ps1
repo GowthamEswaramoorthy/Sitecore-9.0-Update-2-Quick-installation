@@ -20,7 +20,7 @@ https://www.sitecoregabe.com/2018/04/sitecore-9-machine-prerequisites-check.html
 $HwCoresCheckPassed = $false
 $hwRAMCheckPassed = $false
 $OSCheckPassed = $false
-$PowershellPassed=$false
+$PowershellPassed = $false
 $IISCheckPassed = $false
 $DotnetCheckPassed = $false
 $SQLCheckPassed = $false
@@ -39,7 +39,7 @@ Write-Host
 Write-Host
 Write-Host "CHECKING CORES..." -ForegroundColor Cyan
 Write-Host "________________ " -ForegroundColor Cyan
-$cores = Get-WmiObject –class Win32_processor
+$cores = Get-CimInstance -ClassName 'Win32_Processor' | Select-Object -Property 'NumberOfCores';
 if ($cores.NumberOfCores -ge $noOfcores) {
     Write-Host "+ Minimum number of cores (4) confirmed: " $cores.NumberOfCores " cores installed." -ForegroundColor Green
     $HwCoresCheckPassed = $true
@@ -76,33 +76,29 @@ Write-Host
 Write-Host
 Write-Host "CHECKING OPERATING SYSTEM COMPATIBILITY..." -ForegroundColor Cyan
 Write-Host "__________________________________________" -ForegroundColor Cyan
-$OSVersion = (get-itemproperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name ProductName).ProductName
-if ([Version](Get-CimInstance Win32_OperatingSystem).version -ge [Version]"10.0") {
-    Write-Host "+ Operating system is compatible: "$OSVersion " | " (Get-CimInstance Win32_OperatingSystem).version -ForegroundColor Green
-    $OSCheckPassed = $true
+$OSVersion = (Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name ProductName).ProductName
+if ([version](Get-CimInstance Win32_OperatingSystem).Version -ge [version]"10.0") {
+    Write-Host "Operating system is compatible: "$OSVersion "|" (Get-CimInstance Win32_OperatingSystem).Version -ForegroundColor Green
+    $OSCheckPassed = $true    
 }
-elseif ([Version](Get-CimInstance Win32_OperatingSystem).version -ge [Version]"6.3") {
-   
+elseif ([version](Get-CimInstance Win32_OperatingSystem).Version -ge [version]"6.3") {
     if ($OSVersion -contains "Windows Server 2008 R2") {
-        # Check if 2012 R2 is running 64bit
-        if ([environment]::Is64BitProcess) {
-            Write-Host "✓ Operating system is compatible: " $OSVersion " | " (Get-CimInstance Win32_OperatingSystem).version -ForegroundColor Green
+        if ([System.Environment]::Is64BitProcess) {
+            Write-Host "Operating system is compatible: "$OSVersion "|" (Get-CimInstance Win32_OperatingSystem).Version -ForegroundColor Green
             $OSCheckPassed = $true
         }
         else {
             $OSCheckPassed = $false
         }
-
     }
     else {
-        Write-Host "+ Operating system is compatible: " $OSVersion " | " (Get-CimInstance Win32_OperatingSystem).version -ForegroundColor Green
+        Write-Host "Operating system is compatible: "$OSVersion "|" (Get-CimInstance Win32_OperatingSystem).Version -ForegroundColor Green
         $OSCheckPassed = $true
     }
 }
 else {
-    Write-Host "X Operating system is not compatible." -ForegroundColor Red
+    Write-Host "X Operating system is not compatible" -ForegroundColor Red
 }
-
 
 ######### Check Folder Persmissons
 Write-Host
@@ -188,7 +184,7 @@ Write-Host
 Write-Host
 Write-Host "CHECKING FOR IIS VERSION 8.5+..." -ForegroundColor Cyan
 Write-Host "________________________________" -ForegroundColor Cyan
-$iisversion = get-itemproperty HKLM:\SOFTWARE\Microsoft\InetStp\
+$iisversion = Get-ItemProperty HKLM:\SOFTWARE\Microsoft\InetStp\
 if ($iisversion.MajorVersion -ge 8.5) {
     Write-Host "+ IIS version 8.5+ installed." -ForegroundColor Green
     $IISCheckPassed = $true
@@ -202,11 +198,11 @@ Write-Host
 Write-Host
 Write-Host "CHECKING POWERSHELL COMPATIBILITY..." -ForegroundColor Cyan
 Write-Host "________________________________________" -ForegroundColor Cyan
-if(($PSVersionTable.PSVersion.Major -ge 5) -and ($PSVersionTable.PSVersion.Minor -ge 1)){
+if (($PSVersionTable.PSVersion.Major -ge 5) -and ($PSVersionTable.PSVersion.Minor -ge 1)) {
     Write-Host "+ POWERSHELL version 5.1+ installed." -ForegroundColor Green
-    $PowershellPassed=$true
+    $PowershellPassed = $true
 }
-else{
+else {
     Write-Host "X Powershell version 5.1+  not installed!" -ForegroundColor Red
 }
 
@@ -215,7 +211,7 @@ Write-Host
 Write-Host
 Write-Host "CHECKING .NET FRAMEWORK COMPATIBILITY..." -ForegroundColor Cyan
 Write-Host "________________________________________" -ForegroundColor Cyan
-if (Get-ChildItem "HKLM:SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\" | Get-ItemPropertyValue -Name Release | ForEach-Object { $_ -ge 394802}) {
+if (Get-ChildItem "HKLM:SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\" | Get-ItemPropertyValue -Name Release | ForEach-Object { $_ -ge 394802 }) {
     Write-Host "+ Valid .NET Framework (4.6.2+) detected." -ForegroundColor Green
     $DotnetCheckPassed = $true
 }
@@ -225,7 +221,7 @@ Write-Host
 Write-Host
 Write-Host "CHECKING SQL SERVER COMPATIBILITY..." -ForegroundColor Cyan
 Write-Host "____________________________________" -ForegroundColor Cyan
-$inst = (get-itemproperty 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server').InstalledInstances
+$inst = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server').InstalledInstances
 $sqlCorrect = $false
 foreach ($i in $inst) {
     $p = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL').$i
@@ -270,18 +266,18 @@ if ($javaver.CurrentVersion -ge 1.8) {
     # Ensure Java environment variable
     $jreVal = [Environment]::GetEnvironmentVariable("JAVA_HOME", [EnvironmentVariableTarget]::Machine)
     if ($jreVal -eq $null) {
-        $jrew = java -version  2>&1 | foreach-object {$_.tostring()} | Select-String -Pattern 'java version' 
+        $jrew = java.exe -version  2>&1 | ForEach-Object { $_.tostring() } | Select-String -Pattern 'java version' 
         $JREVersion = $jrew -replace "[^0-9._$]"
 
         $javaPrgPath = "C:\Program Files\Java\"
         if (!(Test-Path $javaPrgPath -PathType Container)) { 
-            write-host "C:\Program Files\Java\ not found. Trying C:\Program Files (x86)\Java\" -ForegroundColor Yellow
+            Write-Host "C:\Program Files\Java\ not found. Trying C:\Program Files (x86)\Java\" -ForegroundColor Yellow
             $javaPrgPath = "C:\Program Files (x86)\Java\"
             if (!(Test-Path $javaPrgPath -PathType Container)) { 
-                write-host "-- Path not found" -ForegroundColor Red
+                Write-Host "-- Path not found" -ForegroundColor Red
             }
             else {
-                write-host "C:\Program Files (x86)\Java\  found." -ForegroundColor Green
+                Write-Host "C:\Program Files (x86)\Java\  found." -ForegroundColor Green
             }
         }
 
@@ -315,9 +311,9 @@ Write-Host "_______________" -ForegroundColor Cyan
 # NOTE: I've been running into an issue registering HTTPS based repositories in what appears to be a PowerShell bug.
 # The work around is to register the Register-PSRepositoryFix function as answered here and use it below https://stackoverflow.com/questions/35296482/invalid-web-uri-error-on-register-psrepository 
 #.\Register-PSRepositoryFix -Name SitecoreGallery -SourceLocation https://sitecore.myget.org/F/sc-powershell/api/v2
- if(-Not (Get-PSRepository -Name SitecoreGallery -ErrorAction SilentlyContinue)){ 
- Register-PSRepository -Name SitecoreGallery -SourceLocation https://sitecore.myget.org/F/sc-powershell/api/v2
- }
+if (-Not (Get-PSRepository -Name SitecoreGallery -ErrorAction SilentlyContinue)) { 
+    Register-PSRepository -Name SitecoreGallery -SourceLocation https://sitecore.myget.org/F/sc-powershell/api/v2
+}
 # Install the Sitecore Install Framwork module
 if (Get-Module -ListAvailable -Name  SitecoreInstallFramework) {
     Write-Host "+ SitecoreInstallFramework module is already registered!" -ForegroundColor Green
