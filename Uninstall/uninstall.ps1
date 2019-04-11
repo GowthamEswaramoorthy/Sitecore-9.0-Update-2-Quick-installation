@@ -7,6 +7,7 @@ $uninstallArgs = @{
     SolrRoot = $SolrRoot
     SolrService = $SolrService
     SqlServer = $sqlServer
+    SqlAdminPassword = $SqlAdminPassword
 }
 
 Install-SitecoreConfiguration @uninstallArgs
